@@ -1,0 +1,29 @@
+version: '3.9'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: ingestflow_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root123   # set root password here
+      MYSQL_DATABASE: ingestflow     # optional: create DB
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  api:
+    build: .
+    container_name: ingestflow_api
+    restart: always
+    depends_on:
+      - mysql
+    environment:
+      DATABASE_URL: mysql+pymysql://root:root123@mysql:3306/ingestflow
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+
+volumes:
+  mysql_data:
